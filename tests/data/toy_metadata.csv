@@ -1,0 +1,5 @@
+sample,condition,batch
+S1,tumor,b1
+S2,normal,b1
+S3,tumor,b2
+S4,normal,b2

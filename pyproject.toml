@@ -21,10 +21,25 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 dynamic = ["version"]
-dependencies = []
+# Runtime dependencies live here (not only in environment.yml) because
+# pyproject.toml is the installable-package source of truth: every `pip install`
+# path -- plain pip, CI, and Docker -- resolves from this list. environment.yml
+# is a convenience conda env that installs the package via pip and inherits
+# these transitively; duplicating them there would risk drift.
+dependencies = [
+    "anndata>=0.10",
+    "numpy>=1.26",
+    "pandas>=2.0",
+]
 
 [project.optional-dependencies]
-dev = ["ruff>=0.6", "mypy>=1.11", "pytest>=8.0", "pre-commit>=3.7"]
+dev = [
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "pytest>=8.0",
+    "pre-commit>=3.7",
+    "pandas-stubs>=2.0",
+]
 
 [tool.setuptools.dynamic]
 version = { attr = "scdecon.__version__" }
@@ -44,6 +59,13 @@ select = ["E", "F", "I", "W", "UP", "B"]
 python_version = "3.11"
 strict = true
 files = ["src", "tests"]
+
+# anndata's source uses newer syntax than our 3.11 target; treat it as opaque
+# rather than type-checking the library itself.
+[[tool.mypy.overrides]]
+module = ["anndata.*"]
+follow_imports = "skip"
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

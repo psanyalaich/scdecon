@@ -11,8 +11,6 @@ It builds a cell-type signature matrix from single-cell data, then solves a
 constrained regression to infer cell-type proportions in bulk samples —
 `Bulk ≈ Signature × Proportions`, subject to non-negativity and sum-to-one.
 
-
-
 ## Installation
 
 Requires Python 3.11+.
