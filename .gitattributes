@@ -1,0 +1,37 @@
+# Normalize line endings: store LF in the repo, auto-convert on checkout.
+* text=auto eol=lf
+
+# Explicitly text
+*.py    text
+*.pyi   text
+*.toml  text
+*.cfg   text
+*.ini   text
+*.yaml  text
+*.yml   text
+*.json  text
+*.md    text
+*.txt   text
+*.rst   text
+
+# Windows-native scripts keep CRLF
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# Shell scripts must stay LF
+*.sh    text eol=lf
+
+# Binary / data formats: never touch
+*.h5ad  binary
+*.h5    binary
+*.parquet binary
+*.npy   binary
+*.npz   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.pdf   binary
+*.gz    binary
+*.zip   binary
+*.ipynb binary

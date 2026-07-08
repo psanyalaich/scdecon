@@ -1,0 +1,24 @@
+# Minimal conda/mamba development environment for milestone M0.
+#
+# Provides Python 3.11 and the development tooling only. Scientific
+# dependencies (scanpy, numpy, scipy, ...) are added in later milestones as
+# each feature requires them. The bioconda channel is declared up front to
+# match the project blueprint, though no bioconda package is needed yet.
+#
+# Channel order follows bioconda's guidance: conda-forge takes priority.
+#
+#   conda env create -f environment.yml   (or: mamba env create -f environment.yml)
+#   conda activate scdecon
+name: scdecon
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.11
+  - pip
+  - ruff
+  - mypy
+  - pytest
+  - pre-commit
+  - pip:
+      - -e .
