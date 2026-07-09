@@ -115,6 +115,53 @@ def test_deconvolution_does_not_import_biological_containers() -> None:
     )
 
 
+def test_sklearn_is_isolated_to_nusvr() -> None:
+    assert scdecon.deconvolution.__file__ is not None
+    package_dir = Path(scdecon.deconvolution.__file__).parent
+    offenders: list[str] = []
+    for path in sorted(package_dir.rglob("*.py")):
+        if path.name == "nusvr.py":
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for module, level in _imports(tree):
+            if level == 0 and (module == "sklearn" or module.startswith("sklearn.")):
+                offenders.append(f"{path.name}: {module!r}")
+    assert not offenders, (
+        f"scikit-learn must be isolated to deconvolution/nusvr.py; found: {offenders}"
+    )
+
+
+_CONCRETE_SOLVERS = {"NNLSSolver", "NuSVRSolver", "RobustSolver"}
+_CONCRETE_SOLVER_MODULES = {
+    "scdecon.deconvolution.nnls",
+    "scdecon.deconvolution.nusvr",
+    "scdecon.deconvolution.robust",
+}
+
+
+def test_benchmark_is_solver_agnostic() -> None:
+    """benchmark.py must depend only on the Solver ABC, never a concrete solver."""
+    assert scdecon.deconvolution.__file__ is not None
+    benchmark_path = Path(scdecon.deconvolution.__file__).parent / "benchmark.py"
+    tree = ast.parse(benchmark_path.read_text(encoding="utf-8"))
+    offenders: list[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name in _CONCRETE_SOLVER_MODULES:
+                    offenders.append(alias.name)
+        elif isinstance(node, ast.ImportFrom):
+            if node.module in _CONCRETE_SOLVER_MODULES:
+                offenders.append(node.module)
+            for alias in node.names:
+                if alias.name in _CONCRETE_SOLVERS:
+                    offenders.append(alias.name)
+    assert not offenders, (
+        "benchmark.py must be solver-agnostic (import only the Solver ABC); "
+        f"found references to concrete solvers: {offenders}"
+    )
+
+
 def test_solver_core_modules_are_format_agnostic() -> None:
     assert scdecon.deconvolution.__file__ is not None
     package_dir = Path(scdecon.deconvolution.__file__).parent

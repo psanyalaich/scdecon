@@ -7,7 +7,13 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from scdecon.plotting import plot_signature_heatmap, plot_truth_vs_prediction
+from scdecon.deconvolution import BenchmarkResult
+from scdecon.plotting import (
+    plot_benchmark,
+    plot_signature_heatmap,
+    plot_truth_vs_prediction,
+)
+from scdecon.validation import ValidationReport
 
 
 def _signature() -> pd.DataFrame:
@@ -70,3 +76,32 @@ def test_truth_vs_prediction_mismatch_raises(tmp_path: Path) -> None:
     prediction = truth.rename(index={"C": "D"})
     with pytest.raises(ValueError, match="cell types differ"):
         plot_truth_vs_prediction(truth, prediction, tmp_path / "bad.png")
+
+
+def _benchmark_result() -> BenchmarkResult:
+    per_type = pd.DataFrame(
+        {"rmse": [0.1], "pearson": [0.9], "spearman": [0.9]},
+        index=pd.Index(["A"], name="cell_type"),
+    )
+    report = ValidationReport(overall_rmse=0.1, per_type=per_type)
+    return BenchmarkResult(
+        reports={"nnls": report, "robust": report},
+        runtimes={"nnls": 0.5, "robust": 0.7},
+    )
+
+
+def test_plot_benchmark_creates_file(tmp_path: Path) -> None:
+    path = plot_benchmark(_benchmark_result(), tmp_path / "bench.png")
+    assert path.is_file()
+    assert path.stat().st_size > 0
+
+
+def test_plot_benchmark_bad_metric_raises(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="metric"):
+        plot_benchmark(_benchmark_result(), tmp_path / "b.png", metric="nope")
+
+
+def test_plot_benchmark_empty_raises(tmp_path: Path) -> None:
+    empty = BenchmarkResult(reports={}, runtimes={})
+    with pytest.raises(ValueError, match="empty"):
+        plot_benchmark(empty, tmp_path / "empty.png")

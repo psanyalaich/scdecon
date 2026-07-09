@@ -9,7 +9,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
 license-files = ["LICENSE"]
-authors = [{ name = "Prisha Sanyal-Aich", email = "palok.aich@gmail.com" }]
+authors = [{ name = "Prisha Sanyal-Aich", email = "psanyalaich@gmail.com" }]
 keywords = ["bioinformatics", "single-cell", "deconvolution", "rna-seq"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
@@ -32,6 +32,7 @@ dependencies = [
     "numpy>=1.26",
     "pandas>=2.0",
     "scanpy>=1.10",
+    "scikit-learn>=1.3",
     "scipy>=1.11",
     "seaborn>=0.13",
 ]
@@ -84,6 +85,11 @@ ignore_missing_imports = true
 # scipy.optimize ships no usable type information; treat it as opaque.
 [[tool.mypy.overrides]]
 module = ["scipy.*"]
+ignore_missing_imports = true
+
+# scikit-learn's type information is incomplete for our use; treat it as opaque.
+[[tool.mypy.overrides]]
+module = ["sklearn.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

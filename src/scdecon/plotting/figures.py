@@ -15,10 +15,15 @@ import pandas as pd
 import seaborn as sns
 from matplotlib.figure import Figure
 
+from scdecon.deconvolution import BenchmarkResult
 from scdecon.logging_utils import get_logger
 from scdecon.validation import align_proportions
 
-__all__ = ["plot_signature_heatmap", "plot_truth_vs_prediction"]
+__all__ = [
+    "plot_benchmark",
+    "plot_signature_heatmap",
+    "plot_truth_vs_prediction",
+]
 
 logger = get_logger("plotting.figures")
 
@@ -146,4 +151,61 @@ def plot_truth_vs_prediction(
     figure.savefig(resolved, dpi=150)
 
     logger.info("Wrote truth-vs-prediction plot to %s", resolved)
+    return resolved
+
+
+def plot_benchmark(
+    result: BenchmarkResult,
+    path: str | Path,
+    *,
+    metric: str = "overall_rmse",
+    title: str | None = None,
+) -> Path:
+    """Render a bar chart comparing solvers on a benchmark metric.
+
+    Parameters
+    ----------
+    result:
+        The :class:`~scdecon.deconvolution.BenchmarkResult` to plot. Solver names
+        are used exactly as recorded.
+    path:
+        Destination image path. Missing parent directories are created.
+    metric:
+        Column of ``result.to_frame()`` to plot (e.g. ``"overall_rmse"``,
+        ``"mean_pearson"``, ``"runtime_s"``).
+    title:
+        Optional figure title.
+
+    Returns
+    -------
+    pathlib.Path
+        The path that was written.
+
+    Raises
+    ------
+    ValueError
+        If the result is empty or ``metric`` is not a benchmark column.
+    """
+    frame = result.to_frame()
+    if frame.empty:
+        raise ValueError("Cannot plot an empty benchmark result.")
+    if metric not in frame.columns:
+        raise ValueError(
+            f"metric '{metric}' is not a benchmark column {list(frame.columns)}."
+        )
+
+    resolved = Path(path)
+    resolved.parent.mkdir(parents=True, exist_ok=True)
+
+    figure = Figure(figsize=(max(4.0, len(frame) * 1.2), 4.0))
+    axes = figure.subplots()
+    axes.bar([str(name) for name in frame.index], frame[metric].to_numpy())
+    axes.set_xlabel("solver")
+    axes.set_ylabel(metric)
+    if title is not None:
+        axes.set_title(title)
+    figure.tight_layout()
+    figure.savefig(resolved, dpi=150)
+
+    logger.info("Wrote benchmark plot to %s", resolved)
     return resolved

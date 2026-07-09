@@ -6,8 +6,13 @@ seaborn live only here.
 """
 
 from scdecon.plotting.figures import (
+    plot_benchmark,
     plot_signature_heatmap,
     plot_truth_vs_prediction,
 )
 
-__all__ = ["plot_signature_heatmap", "plot_truth_vs_prediction"]
+__all__ = [
+    "plot_benchmark",
+    "plot_signature_heatmap",
+    "plot_truth_vs_prediction",
+]
