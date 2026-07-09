@@ -43,3 +43,8 @@ Thumbs.db
 data/*
 !data/README.md
 !data/.gitkeep
+
+# Docs
+CLAUDE.md
+architecture/
+project_memory/
