@@ -30,6 +30,7 @@ dependencies = [
     "anndata>=0.10",
     "numpy>=1.26",
     "pandas>=2.0",
+    "scanpy>=1.10",
 ]
 
 [project.optional-dependencies]
@@ -63,6 +64,12 @@ files = ["src", "tests"]
 # rather than type-checking the library itself.
 [[tool.mypy.overrides]]
 module = ["anndata.*"]
+follow_imports = "skip"
+ignore_missing_imports = true
+
+# scanpy ships no usable type information; treat it as opaque like anndata.
+[[tool.mypy.overrides]]
+module = ["scanpy.*"]
 follow_imports = "skip"
 ignore_missing_imports = true
 
