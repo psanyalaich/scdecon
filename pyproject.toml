@@ -56,7 +56,6 @@ src = ["src", "tests"]
 select = ["E", "F", "I", "W", "UP", "B"]
 
 [tool.mypy]
-python_version = "3.11"
 strict = true
 files = ["src", "tests"]
 
