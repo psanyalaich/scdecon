@@ -1,9 +1,13 @@
 """Architectural guardrails enforced as tests.
 
-The preprocessing layer must operate purely on in-memory AnnData objects and
-must not reach into the I/O layer: ``scdecon.io`` stays solely responsible for
-reading and writing data. This is checked statically (by parsing imports) so the
-guarantee holds regardless of test import order.
+Dependency direction is checked statically (by parsing imports) so the
+guarantees hold regardless of test import order:
+
+- The computation layers (preprocessing, signature) must not import the I/O
+  layer ``scdecon.io``.
+- The computational core (io, preprocessing, signature) must not import the
+  plotting stack (``scdecon.plotting``, matplotlib, seaborn): plotting depends
+  on the core, never the reverse.
 """
 
 from __future__ import annotations
@@ -11,8 +15,13 @@ from __future__ import annotations
 import ast
 from collections.abc import Iterator
 from pathlib import Path
+from types import ModuleType
 
+import pytest
+
+import scdecon.io
 import scdecon.preprocessing
+import scdecon.signature
 
 
 def _imports(tree: ast.AST) -> Iterator[tuple[str, int]]:
@@ -25,23 +34,50 @@ def _imports(tree: ast.AST) -> Iterator[tuple[str, int]]:
             yield (node.module or ""), node.level
 
 
-def _references_io(module: str, level: int) -> bool:
-    """Whether an import refers to the scdecon.io package (absolute or relative)."""
-    if level == 0:
-        return module == "scdecon.io" or module.startswith("scdecon.io.")
-    # relative import from within the scdecon package, e.g. ``from ..io import x``
-    return module == "io" or module.startswith("io.")
+def _matches(module: str, level: int, absolute: set[str], relative: set[str]) -> bool:
+    """Whether an import refers to any forbidden package (absolute or relative)."""
+    names = absolute if level == 0 else relative
+    return any(module == name or module.startswith(f"{name}.") for name in names)
 
 
-def test_preprocessing_does_not_import_io() -> None:
-    package_dir = Path(scdecon.preprocessing.__file__).parent
-    offenders: list[str] = []
+def _offenders(
+    package: ModuleType, absolute: set[str], relative: set[str]
+) -> list[str]:
+    assert package.__file__ is not None
+    package_dir = Path(package.__file__).parent
+    found: list[str] = []
     for path in sorted(package_dir.rglob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"))
         for module, level in _imports(tree):
-            if _references_io(module, level):
-                offenders.append(f"{path.name}: level={level} module={module!r}")
+            if _matches(module, level, absolute, relative):
+                found.append(f"{package.__name__}/{path.name}: {module!r}")
+    return found
+
+
+@pytest.mark.parametrize(
+    "package",
+    [scdecon.preprocessing, scdecon.signature],
+    ids=lambda pkg: pkg.__name__,
+)
+def test_computation_layer_does_not_import_io(package: ModuleType) -> None:
+    offenders = _offenders(package, {"scdecon.io"}, {"io"})
     assert not offenders, (
-        "scdecon.preprocessing must not import scdecon.io (I/O stays in the io "
-        f"layer); found: {offenders}"
+        f"{package.__name__} must not import scdecon.io; found: {offenders}"
+    )
+
+
+@pytest.mark.parametrize(
+    "package",
+    [scdecon.io, scdecon.preprocessing, scdecon.signature],
+    ids=lambda pkg: pkg.__name__,
+)
+def test_core_does_not_import_plotting_stack(package: ModuleType) -> None:
+    offenders = _offenders(
+        package,
+        {"scdecon.plotting", "matplotlib", "seaborn"},
+        {"plotting"},
+    )
+    assert not offenders, (
+        f"{package.__name__} must not import the plotting stack (plotting depends "
+        f"on the core, never the reverse); found: {offenders}"
     )

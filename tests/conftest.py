@@ -70,3 +70,50 @@ def raw_counts_adata() -> anndata.AnnData:
     obs = pd.DataFrame(index=[f"cell{i}" for i in range(6)])
     var = pd.DataFrame(index=genes)
     return anndata.AnnData(X=counts, obs=obs, var=var)
+
+
+@pytest.fixture
+def synthetic_signature_adata() -> anndata.AnnData:
+    """Log-normalised AnnData with known cell-type marker structure.
+
+    Four cell types (A, B, C, D), four cells each. GA1/GA2, GB1/GB2, GC1/GC2,
+    GD1/GD2 are specific to A, B, C, D respectively. SHARED is high in both A and
+    B and NOISE is elevated nowhere specifically; both are non-specific and
+    should be dropped by the cross-type specificity filter. HK1 is housekeeping.
+    Small deterministic jitter breaks exact ties.
+    """
+    cell_types = ["A"] * 4 + ["B"] * 4 + ["C"] * 4 + ["D"] * 4
+    genes = [
+        "GA1",
+        "GA2",
+        "GB1",
+        "GB2",
+        "GC1",
+        "GC2",
+        "GD1",
+        "GD2",
+        "SHARED",
+        "HK1",
+        "NOISE",
+    ]
+    col = {gene: i for i, gene in enumerate(genes)}
+    base = np.zeros((16, len(genes)), dtype=np.float64)
+    for gene in ("GA1", "GA2", "SHARED"):
+        base[0:4, col[gene]] = 5.0
+    for gene in ("GB1", "GB2", "SHARED"):
+        base[4:8, col[gene]] = 5.0
+    for gene in ("GC1", "GC2"):
+        base[8:12, col[gene]] = 5.0
+    for gene in ("GD1", "GD2"):
+        base[12:16, col[gene]] = 5.0
+    base[:, col["HK1"]] = 2.0
+    base[:, col["NOISE"]] = 0.5
+
+    rng = np.random.default_rng(0)
+    counts = (base + rng.random((16, len(genes))) * 0.01).astype(np.float32)
+    obs = pd.DataFrame(
+        {"cell_type": pd.Categorical(cell_types)},
+        index=[f"cell{i}" for i in range(16)],
+    )
+    var = pd.DataFrame(index=genes)
+    return anndata.AnnData(X=counts, obs=obs, var=var)

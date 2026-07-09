@@ -28,9 +28,11 @@ dynamic = ["version"]
 # these transitively; duplicating them there would risk drift.
 dependencies = [
     "anndata>=0.10",
+    "matplotlib>=3.8",
     "numpy>=1.26",
     "pandas>=2.0",
     "scanpy>=1.10",
+    "seaborn>=0.13",
 ]
 
 [project.optional-dependencies]
@@ -71,6 +73,11 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = ["scanpy.*"]
 follow_imports = "skip"
+ignore_missing_imports = true
+
+# seaborn ships no type information; treat it as opaque.
+[[tool.mypy.overrides]]
+module = ["seaborn.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
