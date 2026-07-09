@@ -27,6 +27,8 @@ import scdecon.deconvolution
 import scdecon.io
 import scdecon.preprocessing
 import scdecon.signature
+import scdecon.simulation
+import scdecon.validation
 
 #: Modules inside ``scdecon.deconvolution`` that hold the numerical solver core
 #: and must operate purely on NumPy/SciPy arrays.
@@ -65,7 +67,13 @@ def _offenders(
 
 @pytest.mark.parametrize(
     "package",
-    [scdecon.preprocessing, scdecon.signature, scdecon.deconvolution],
+    [
+        scdecon.preprocessing,
+        scdecon.signature,
+        scdecon.deconvolution,
+        scdecon.simulation,
+        scdecon.validation,
+    ],
     ids=lambda pkg: pkg.__name__,
 )
 def test_computation_layer_does_not_import_io(package: ModuleType) -> None:
@@ -82,6 +90,8 @@ def test_computation_layer_does_not_import_io(package: ModuleType) -> None:
         scdecon.preprocessing,
         scdecon.signature,
         scdecon.deconvolution,
+        scdecon.simulation,
+        scdecon.validation,
     ],
     ids=lambda pkg: pkg.__name__,
 )
