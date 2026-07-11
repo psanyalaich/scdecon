@@ -162,6 +162,60 @@ def test_benchmark_is_solver_agnostic() -> None:
     )
 
 
+def test_src_does_not_import_scripts() -> None:
+    """The installable package must never depend on dataset-specific scripts/.
+
+    ``scripts/`` holds dataset-specific ingestion (ADR-0010) and lives outside the
+    package; the dependency may only point scripts -> scdecon, never the reverse.
+    """
+    import scdecon
+
+    assert scdecon.__file__ is not None
+    package_dir = Path(scdecon.__file__).parent
+    offenders: list[str] = []
+    for path in sorted(package_dir.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for module, level in _imports(tree):
+            if level == 0 and (module == "scripts" or module.startswith("scripts.")):
+                offenders.append(f"{path.name}: {module!r}")
+    assert not offenders, (
+        f"scdecon must not import the scripts/ package; found: {offenders}"
+    )
+
+
+def test_genes_module_is_dataset_agnostic() -> None:
+    """scdecon.genes holds generic gene-ID utilities and must stay reusable.
+
+    It must not reach into the I/O or plotting layers, pull in biological data
+    containers (anndata/scanpy), or otherwise couple to any dataset or format --
+    it operates only on in-memory strings/DataFrames plus a caller-supplied
+    mapping.
+    """
+    import scdecon
+
+    assert scdecon.__file__ is not None
+    genes_path = Path(scdecon.__file__).parent / "genes.py"
+    forbidden = {
+        "scdecon.io",
+        "scdecon.plotting",
+        "anndata",
+        "scanpy",
+        "matplotlib",
+        "seaborn",
+    }
+    tree = ast.parse(genes_path.read_text(encoding="utf-8"))
+    offenders = [
+        f"genes.py: {module!r}"
+        for module, level in _imports(tree)
+        if level == 0
+        and any(module == name or module.startswith(f"{name}.") for name in forbidden)
+    ]
+    assert not offenders, (
+        "scdecon.genes must stay dataset-agnostic (no io/plotting/anndata/scanpy); "
+        f"found: {offenders}"
+    )
+
+
 def test_solver_core_modules_are_format_agnostic() -> None:
     assert scdecon.deconvolution.__file__ is not None
     package_dir = Path(scdecon.deconvolution.__file__).parent

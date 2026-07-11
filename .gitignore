@@ -38,8 +38,7 @@ Thumbs.db
 .idea/
 .vscode/
 
-# Data: never commit large data (see blueprint §7).
-# Only data/README.md and data/.gitkeep are tracked.
+# Data
 data/*
 !data/README.md
 !data/.gitkeep
@@ -48,4 +47,3 @@ data/*
 CLAUDE.md
 architecture/
 project_memory/
-CHANGELOG.md
