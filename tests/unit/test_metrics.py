@@ -110,6 +110,13 @@ def test_duplicate_labels_raise() -> None:
         align_proportions(dup, truth)
 
 
+def test_duplicate_sample_labels_raise() -> None:
+    truth = _truth()
+    dup = pd.concat([truth, truth.iloc[:, [0]]], axis=1)  # duplicate sample column
+    with pytest.raises(ValueError, match="Duplicate sample"):
+        align_proportions(dup, truth)
+
+
 def test_report_is_lightweight_and_typed() -> None:
     report = evaluate(_truth(), _truth().copy())
     assert isinstance(report, ValidationReport)

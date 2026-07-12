@@ -11,6 +11,17 @@ Releases correspond to development milestones (M0 → v0.1.0, M1 → v0.2.0, …
 
 ## [Unreleased]
 
+### Release readiness (M7.5)
+- **Fixed:** `scdecon.__version__` now reports the release version (`0.8.0`)
+  instead of the placeholder `0.0.0`; the distribution metadata matches on
+  (re)install.
+- **Added:** `py.typed` marker (PEP 561) + packaging config, so `scdecon`'s type
+  hints are exported to downstream consumers.
+- **Added:** coverage measurement via `pytest-cov` (built into `pytest`); current
+  coverage is 96% (package + scripts). Added two targeted tests for previously
+  untested public error contracts (`align_proportions` duplicate sample labels;
+  `read_metadata` empty table).
+
 ## [0.8.0] - 2026-07-10 — Real tumour data & expression-space harmonisation (M7)
 
 ### Added — package (`scdecon`)

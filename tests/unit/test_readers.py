@@ -95,6 +95,13 @@ def test_read_metadata_duplicate_index(tmp_path: Path) -> None:
         read_metadata(path)
 
 
+def test_read_metadata_empty(tmp_path: Path) -> None:
+    path = tmp_path / "empty.csv"
+    path.write_text("", encoding="utf-8")
+    with pytest.raises(ValueError, match="empty"):
+        read_metadata(path)
+
+
 # --- read_h5ad -------------------------------------------------------------
 
 
