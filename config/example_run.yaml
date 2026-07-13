@@ -1,0 +1,44 @@
+# Example scdecon run configuration.
+#
+# This file is consumed by BOTH the Snakemake workflow (workflow/Snakefile, to
+# wire file dependencies) and the `scdecon` CLI (which does the work). It is a
+# valid `scdecon.config.RunConfig`; do NOT add workflow-only keys here (the CLI
+# validates it with extra="forbid"). Every path the workflow declares as an
+# input/output must be present under `paths`.
+#
+# Fields left unset inherit the frozen-dataclass defaults; the values below are
+# illustrative. Run from the repository root with:  snakemake --cores 1
+
+paths:
+  # Input: an annotated single-cell reference (.h5ad) that you provide.
+  reference: data/reference.h5ad
+  # Outputs produced by the workflow (created under results/):
+  signature: results/signature.tsv
+  heatmap: results/signature_heatmap.png
+  bulk: results/pseudobulk.tsv
+  truth: results/truth_proportions.tsv
+  proportions: results/estimated_proportions.tsv
+  metrics: results/benchmark_metrics.tsv
+  benchmark_plot: results/benchmark.png
+
+preprocessing:
+  min_genes: 200
+  min_cells: 3
+  max_pct_mito: 20.0
+
+markers:
+  n_markers_per_type: 25
+  method: wilcoxon
+
+simulation:
+  n_samples: 50
+  n_cells_per_sample: 500
+  cell_type_key: cell_type
+  random_state: 0
+
+solver:
+  name: nnls
+
+benchmark:
+  solvers: [nnls, nusvr, robust]
+  metric: overall_rmse

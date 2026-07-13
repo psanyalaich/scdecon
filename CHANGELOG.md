@@ -11,16 +11,50 @@ Releases correspond to development milestones (M0 → v0.1.0, M1 → v0.2.0, …
 
 ## [Unreleased]
 
-### Release readiness (M7.5)
-- **Fixed:** `scdecon.__version__` now reports the release version (`0.8.0`)
-  instead of the placeholder `0.0.0`; the distribution metadata matches on
-  (re)install.
-- **Added:** `py.typed` marker (PEP 561) + packaging config, so `scdecon`'s type
-  hints are exported to downstream consumers.
-- **Added:** coverage measurement via `pytest-cov` (built into `pytest`); current
-  coverage is 96% (package + scripts). Added two targeted tests for previously
-  untested public error contracts (`align_proportions` duplicate sample labels;
-  `read_metadata` empty table).
+## [0.9.0] - 2026-07-13 — CLI, configuration & Snakemake pipeline (M8)
+
+### Added — package (`scdecon`)
+- `scdecon.config` — a Pydantic run-configuration schema (`RunConfig` + typed
+  sub-models) that parses/validates a YAML run file and constructs the existing
+  frozen parameter dataclasses. It is a declarative validation boundary: the
+  frozen dataclasses remain the single source of truth for defaults and range
+  validation (only user-set fields are forwarded), and it builds no solver
+  instances.
+- `scdecon.cli` — a Typer command-line interface and composition root exposing
+  `version`, `build-signature`, `simulate`, `deconvolve`, and `benchmark`. It
+  loads config, constructs objects (including the solver), calls existing public
+  library functions, and maps outcomes to a documented exit-code policy
+  (0 success, 1 unexpected, 2 usage, 3 config, 4 input, 5 computation). No
+  scientific logic lives in the CLI (ADR-0013).
+- A `scdecon` console entry point (`scdecon.cli:app`) declared in
+  `pyproject.toml`.
+
+### Added — orchestration & tooling (not package API)
+- `workflow/Snakefile` + `config/example_run.yaml` — a Snakemake pipeline that
+  reproduces `build-signature → simulate → deconvolve → benchmark` by shelling
+  out to the `scdecon` CLI (no rule imports Python modules). The run-config file
+  is shared by the workflow and the CLI, so it stays a valid `RunConfig`.
+- End-to-end integration tests (`tests/integration/`): the CLI pipeline (runs
+  everywhere) and the Snakemake execution (skipped unless Snakemake is
+  installed). A dedicated CI job installs the `pipeline` extra and runs both.
+
+### Changed
+- New runtime dependencies: `typer`, `pydantic`, `pyyaml`. New optional extra
+  `pipeline` (`snakemake`) for running the workflow; dev extra gains
+  `types-PyYAML`.
+
+## [0.8.1] - 2026-07-11 — Release readiness (M7.5)
+
+### Fixed
+- `scdecon.__version__` now reports the release version instead of the
+  placeholder `0.0.0`; the distribution metadata matches on (re)install.
+
+### Added
+- `py.typed` marker (PEP 561) + packaging config, so `scdecon`'s type hints are
+  exported to downstream consumers.
+- Coverage measurement via `pytest-cov` (built into `pytest`); coverage is 96%
+  (package + scripts). Two targeted tests for previously untested public error
+  contracts (`align_proportions` duplicate sample labels; `read_metadata` empty).
 
 ## [0.8.0] - 2026-07-10 — Real tumour data & expression-space harmonisation (M7)
 
@@ -211,7 +245,9 @@ Releases correspond to development milestones (M0 → v0.1.0, M1 → v0.2.0, …
 - MIT license, README, smoke test, conda `environment.yml`
   (conda-forge + bioconda), `.gitattributes`, `.editorconfig`.
 
-[Unreleased]: https://github.com/psanyalaich/scdecon/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/psanyalaich/scdecon/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/psanyalaich/scdecon/releases/tag/v0.9.0
+[0.8.1]: https://github.com/psanyalaich/scdecon/releases/tag/v0.8.1
 [0.8.0]: https://github.com/psanyalaich/scdecon/releases/tag/v0.8.0
 [0.7.0]: https://github.com/psanyalaich/scdecon/releases/tag/v0.7.0
 [0.6.0]: https://github.com/psanyalaich/scdecon/releases/tag/v0.6.0

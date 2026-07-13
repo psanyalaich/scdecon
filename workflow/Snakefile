@@ -1,0 +1,97 @@
+# Snakemake workflow orchestrating the scdecon CLI.
+#
+# This workflow is an *automated user of the ``scdecon`` command-line interface*,
+# not a second API. Every rule shells out to the installed CLI
+# (``scdecon <command> --config <file>``); no rule imports scdecon Python
+# modules. The CLI is the single public orchestration interface (ADR-0013); this
+# file only wires file dependencies so the pipeline is reproducible and
+# idempotent (Snakemake reruns a step only when its declared inputs change).
+#
+# The reference ``.h5ad`` is a leaf input you provide (there is no download rule:
+# real-data ingestion is dataset-specific and lives in ``scripts/``, ADR-0010).
+#
+# Usage (run from the repository root)::
+#
+#     snakemake --cores 1                                  # config/example_run.yaml
+#     snakemake --cores 1 --config run_config=my_run.yaml  # a different config
+#     snakemake -n                                         # dry run (show the plan)
+#
+# The run-config file is consumed by BOTH this workflow (to learn the input/
+# output paths) and the CLI (which does all the work), so it must be a valid
+# ``scdecon`` run configuration (see ``scdecon.config.RunConfig``). Reading it
+# here with ``yaml`` is orchestration only -- no scientific code runs in the
+# Snakefile. The two override knobs are passed via ``--config`` (kept out of the
+# run-config *file* so the file stays a valid scdecon configuration):
+#
+#     --config run_config=PATH          # which run configuration to use
+#     --config scdecon_command="python -m scdecon.cli"   # PATH-independent CLI
+
+import yaml
+
+RUN_CONFIG = config.get("run_config", "config/example_run.yaml")
+SCDECON = config.get("scdecon_command", "scdecon")
+
+with open(RUN_CONFIG, encoding="utf-8") as _handle:
+    paths = yaml.safe_load(_handle)["paths"]
+
+
+rule all:
+    input:
+        paths["proportions"],
+        paths["metrics"],
+        paths["benchmark_plot"],
+        paths["heatmap"],
+
+
+rule build_signature:
+    input:
+        paths["reference"],
+    output:
+        paths["signature"],
+        paths["heatmap"],
+    params:
+        cmd=SCDECON,
+        run_config=RUN_CONFIG,
+    shell:
+        "{params.cmd} build-signature --config {params.run_config}"
+
+
+rule simulate:
+    input:
+        paths["reference"],
+    output:
+        paths["bulk"],
+        paths["truth"],
+    params:
+        cmd=SCDECON,
+        run_config=RUN_CONFIG,
+    shell:
+        "{params.cmd} simulate --config {params.run_config}"
+
+
+rule deconvolve:
+    input:
+        paths["signature"],
+        paths["bulk"],
+    output:
+        paths["proportions"],
+    params:
+        cmd=SCDECON,
+        run_config=RUN_CONFIG,
+    shell:
+        "{params.cmd} deconvolve --config {params.run_config}"
+
+
+rule benchmark:
+    input:
+        paths["signature"],
+        paths["bulk"],
+        paths["truth"],
+    output:
+        paths["metrics"],
+        paths["benchmark_plot"],
+    params:
+        cmd=SCDECON,
+        run_config=RUN_CONFIG,
+    shell:
+        "{params.cmd} benchmark --config {params.run_config}"

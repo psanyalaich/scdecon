@@ -73,6 +73,45 @@ def raw_counts_adata() -> anndata.AnnData:
 
 
 @pytest.fixture
+def raw_reference_adata() -> anndata.AnnData:
+    """Raw-count reference with clear per-cell-type markers for the CLI pipeline.
+
+    Four cell types (A, B, C, D), six cells each; two type-specific marker genes
+    per type (high only in that type) plus two housekeeping genes (high
+    everywhere). Suitable for the full ``build-signature -> simulate ->
+    deconvolve -> benchmark`` chain under lenient preprocessing.
+    """
+    rng = np.random.default_rng(0)
+    cell_types = ["A", "B", "C", "D"]
+    genes = ["GA1", "GA2", "GB1", "GB2", "GC1", "GC2", "GD1", "GD2", "HK1", "HK2"]
+    markers = {
+        "A": ("GA1", "GA2"),
+        "B": ("GB1", "GB2"),
+        "C": ("GC1", "GC2"),
+        "D": ("GD1", "GD2"),
+    }
+    gene_index = {gene: i for i, gene in enumerate(genes)}
+    rows: list[np.ndarray] = []
+    labels: list[str] = []
+    for cell_type in cell_types:
+        for _ in range(6):
+            row = rng.integers(0, 2, size=len(genes)).astype(np.float64)
+            row[gene_index["HK1"]] = 5 + rng.integers(0, 3)
+            row[gene_index["HK2"]] = 5 + rng.integers(0, 3)
+            for marker in markers[cell_type]:
+                row[gene_index[marker]] = 12 + rng.integers(0, 5)
+            rows.append(row)
+            labels.append(cell_type)
+    counts = np.asarray(rows, dtype=np.float32)
+    obs = pd.DataFrame(
+        {"cell_type": pd.Categorical(labels)},
+        index=[f"cell{i}" for i in range(len(labels))],
+    )
+    var = pd.DataFrame(index=genes)
+    return anndata.AnnData(X=counts, obs=obs, var=var)
+
+
+@pytest.fixture
 def synthetic_signature_adata() -> anndata.AnnData:
     """Log-normalised AnnData with known cell-type marker structure.
 

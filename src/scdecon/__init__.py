@@ -4,6 +4,6 @@ Estimate cell-type proportions in bulk RNA-seq samples using an annotated
 single-cell reference. See the project blueprint for the full design.
 """
 
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 
 __all__ = ["__version__"]
