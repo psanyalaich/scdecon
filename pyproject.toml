@@ -12,7 +12,7 @@ license-files = ["LICENSE"]
 authors = [{ name = "Prisha Sanyal-Aich", email = "psanyalaich@gmail.com" }]
 keywords = ["bioinformatics", "single-cell", "deconvolution", "rna-seq"]
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
@@ -40,6 +40,12 @@ dependencies = [
     "typer>=0.12",
 ]
 
+[project.urls]
+Homepage = "https://github.com/psanyalaich/scdecon"
+Repository = "https://github.com/psanyalaich/scdecon"
+Documentation = "https://psanyalaich.github.io/scdecon"
+Issues = "https://github.com/psanyalaich/scdecon/issues"
+
 [project.scripts]
 scdecon = "scdecon.cli:app"
 
@@ -57,6 +63,12 @@ dev = [
 # need it; install with `pip install -e ".[pipeline]"` to run workflow/Snakefile.
 pipeline = [
     "snakemake>=8",
+]
+# Documentation site toolchain (MkDocs Material + mkdocstrings API docs). Build
+# the site with `pip install -e ".[docs]"` then `mkdocs build`.
+docs = [
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.25",
 ]
 
 [tool.setuptools.dynamic]

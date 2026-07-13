@@ -65,3 +65,19 @@ jobs:
       # is exercised here rather than in every matrix job above.
       - name: Run workflow and integration tests
         run: pytest tests/integration tests/unit/test_workflow.py -v
+
+  docker:
+    name: docker image smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t scdecon:ci .
+
+      # Verify the image runs: the default CMD (`scdecon --help`) starts, and the
+      # CLI resolves subcommands (prints the version).
+      - name: Smoke test — CLI starts
+        run: |
+          docker run --rm scdecon:ci
+          docker run --rm scdecon:ci scdecon version

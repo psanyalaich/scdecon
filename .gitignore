@@ -45,5 +45,7 @@ data/*
 
 # Docs
 CLAUDE.md
-architecture/
 project_memory/
+
+# MkDocs build output (the site is deployed from CI, never committed)
+/site/

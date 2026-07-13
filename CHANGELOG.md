@@ -11,6 +11,30 @@ Releases correspond to development milestones (M0 → v0.1.0, M1 → v0.2.0, …
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-13 — First stable release (M9)
+
+First stable release. From this version, the public Python API, the solver
+interfaces, and the CLI contract follow the deprecation policy in
+`docs/project_memory/11_api_stability.md`; the YAML run-configuration schema is
+intentionally **not** frozen and may still evolve.
+
+### Added
+- **Dockerfile** (single-stage) + `.dockerignore` for reproducibly running the
+  CLI and the Snakemake pipeline in a container; a Docker image smoke test in CI.
+- **Documentation site** (MkDocs Material + mkdocstrings API reference),
+  published to GitHub Pages via `.github/workflows/docs.yml`.
+- **`CITATION.cff`** so the repository is citable.
+- Documentation figures under `docs/assets/`, regenerated deterministically by
+  `docs/generate_figures.py`.
+
+### Changed
+- **README overhaul**: hero, badges, quickstart (CLI / Snakemake / Docker),
+  benchmark figures, and a citation section.
+- **API freeze at 1.0.0**: the library API, the `Solver`/`MarkerSelector`
+  extension interfaces, and the CLI command/exit-code contract are now Stable and
+  covered by the deprecation policy. Documentation build tooling added as an
+  optional `docs` extra.
+
 ## [0.9.0] - 2026-07-13 — CLI, configuration & Snakemake pipeline (M8)
 
 ### Added — package (`scdecon`)
@@ -245,7 +269,8 @@ Releases correspond to development milestones (M0 → v0.1.0, M1 → v0.2.0, …
 - MIT license, README, smoke test, conda `environment.yml`
   (conda-forge + bioconda), `.gitattributes`, `.editorconfig`.
 
-[Unreleased]: https://github.com/psanyalaich/scdecon/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/psanyalaich/scdecon/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/psanyalaich/scdecon/releases/tag/v1.0.0
 [0.9.0]: https://github.com/psanyalaich/scdecon/releases/tag/v0.9.0
 [0.8.1]: https://github.com/psanyalaich/scdecon/releases/tag/v0.8.1
 [0.8.0]: https://github.com/psanyalaich/scdecon/releases/tag/v0.8.0

@@ -1,0 +1,82 @@
+site_name: scdecon
+site_description: Single-cell-reference deconvolution of bulk tumour transcriptomes.
+site_url: https://psanyalaich.github.io/scdecon
+site_author: Prisha Sanyal-Aich
+repo_url: https://github.com/psanyalaich/scdecon
+repo_name: psanyalaich/scdecon
+copyright: Copyright &copy; 2026 Prisha Sanyal-Aich
+
+# The published site is user-facing. The contributor-only continuity system
+# (docs/project_memory/) and the ADRs (docs/architecture/) live in-repo but are
+# deliberately kept out of the site (M9 design decision D1).
+exclude_docs: |
+  project_memory/
+  architecture/
+  generate_figures.py
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+    - search.suggest
+    - toc.follow
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: numpy
+            show_root_heading: true
+            show_root_full_path: false
+            show_source: false
+            show_signature_annotations: true
+            separate_signature: true
+            members_order: source
+            merge_init_into_class: true
+            show_if_no_docstring: false
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - CLI reference: cli.md
+  - "Tutorial: melanoma TME": tutorials/melanoma-tme.md
+  - API reference:
+      - Overview: api/index.md
+      - scdecon.io: api/io.md
+      - scdecon.preprocessing: api/preprocessing.md
+      - scdecon.signature: api/signature.md
+      - scdecon.deconvolution: api/deconvolution.md
+      - scdecon.simulation: api/simulation.md
+      - scdecon.validation: api/validation.md
+      - scdecon.genes: api/genes.md
+      - scdecon.plotting: api/plotting.md

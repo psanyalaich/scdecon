@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: scdecon
+abstract: >-
+  Single-cell-reference deconvolution of bulk tumour transcriptomes. scdecon
+  builds a cell-type signature matrix from an annotated single-cell RNA-seq
+  reference and estimates cell-type proportions in bulk RNA-seq samples via
+  constrained regression, with self-generated pseudobulk ground truth for
+  validation.
+type: software
+authors:
+  - given-names: Prisha
+    family-names: Sanyal-Aich
+    email: psanyalaich@gmail.com
+version: 1.0.0
+date-released: "2026-07-13"
+license: MIT
+repository-code: "https://github.com/psanyalaich/scdecon"
+url: "https://psanyalaich.github.io/scdecon"
+keywords:
+  - bioinformatics
+  - single-cell
+  - deconvolution
+  - rna-seq
+  - tumour-microenvironment
