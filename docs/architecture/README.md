@@ -7,9 +7,8 @@ considered, Decision, Rationale, Consequences, and Future review conditions**.
 ADRs are append-only history: when a decision changes, add a **new** ADR that
 supersedes the old one (note the supersession) rather than editing the old one.
 
-For narrative history and the broader project state, see
-`docs/project_memory/` (especially `02_design_decisions.md` and
-`10_decision_timeline.md`).
+Each ADR is self-contained (Context, Problem, Alternatives, Decision, Rationale,
+Consequences). For the user-visible release history see `CHANGELOG.md`.
 
 ## Index
 

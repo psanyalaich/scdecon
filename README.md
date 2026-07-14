@@ -31,16 +31,20 @@ sum-to-one (`Σ p = 1`).
 
 ## Results
 
-On clean synthetic data the pipeline recovers known cell-type composition almost
-exactly, and all three solvers are compared fairly on the same task:
+On clean **synthetic** data the pipeline recovers known cell-type composition
+almost exactly, and all three solvers are compared fairly on the same task. These
+figures are *not* validation on real tumours — they show correctness of the
+method on data with known ground truth:
 
-| Recovery of known proportions | Solver accuracy |
+| Recovery of known proportions (synthetic) | Solver accuracy (synthetic) |
 |---|---|
-| ![Truth vs. predicted proportions](docs/assets/recovery.png) | ![Solver benchmark](docs/assets/benchmark.png) |
+| ![Truth vs. predicted proportions on synthetic data](docs/assets/recovery.png) | ![Solver RMSE comparison on synthetic data](docs/assets/benchmark.png) |
 
-*Figures are generated deterministically from synthetic data by
+*Figures are generated deterministically by
 [`docs/generate_figures.py`](docs/generate_figures.py). Real-data results (see the
-tutorial) are **relative** cross-platform estimates, not absolute fractions.*
+[tutorial](docs/tutorials/melanoma-tme.md)) are **relative** cross-platform
+estimates, not absolute fractions, and are validated only as a biological sanity
+check — there is no independent real-world ground-truth benchmark.*
 
 ## Installation
 

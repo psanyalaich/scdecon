@@ -4,8 +4,14 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-While the project is pre-1.0 (`0.x`), the public API may change between minor
-versions; see `docs/project_memory/11_api_stability.md` for the stability policy.
+
+**API stability (as of v1.0.0).** The public Python API, the solver/selector
+extension interfaces (`Solver`, `MarkerSelector`, `BaseSimulator`), and the CLI
+contract (command names, options, and the exit-code policy) are **stable**:
+breaking changes to them require a major-version bump and a deprecation cycle
+(deprecate → keep working for one minor release → remove in the next major). The
+YAML run-configuration schema (`scdecon.config`) is intentionally **not** frozen
+and may change in a minor release; such changes are documented here.
 
 Releases correspond to development milestones (M0 → v0.1.0, M1 → v0.2.0, …).
 
@@ -14,8 +20,8 @@ Releases correspond to development milestones (M0 → v0.1.0, M1 → v0.2.0, …
 ## [1.0.0] - 2026-07-13 — First stable release (M9)
 
 First stable release. From this version, the public Python API, the solver
-interfaces, and the CLI contract follow the deprecation policy in
-`docs/project_memory/11_api_stability.md`; the YAML run-configuration schema is
+interfaces, and the CLI contract are stable and covered by the deprecation policy
+described at the top of this file; the YAML run-configuration schema is
 intentionally **not** frozen and may still evolve.
 
 ### Added
@@ -173,9 +179,9 @@ intentionally **not** frozen and may still evolve.
 
 ### Documentation
 - Added this `CHANGELOG.md` (Keep a Changelog format).
-- Added `docs/project_memory/11_api_stability.md` recording API stability tiers,
-  deprecation policy, and the semantic-versioning strategy.
-- Updating the changelog and the API-stability document is now part of the
+- Recorded the API-stability policy (stability tiers, deprecation policy, and the
+  semantic-versioning strategy).
+- Updating the changelog and the API-stability policy is now part of the
   Definition of Done for every release.
 
 ## [0.5.0] - 2026-07-09 — First end-to-end deconvolution workflow (M4)
@@ -203,10 +209,9 @@ intentionally **not** frozen and may still evolve.
   solver-core modules must be NumPy/SciPy-only.
 
 ### Documentation
-- Established the self-describing project-memory system
-  (`docs/project_memory/00`–`10`), Architecture Decision Records
-  (`docs/architecture/ADR-0001`–`ADR-0009`), and `CLAUDE.md`. Documentation
-  became part of the Definition of Done.
+- Established the Architecture Decision Records
+  (`docs/architecture/ADR-0001`–`ADR-0009`) and the project's design-history docs.
+  Documentation became part of the Definition of Done.
 
 ## [0.4.0] - 2026-07-09 — Signature matrix generation (M3)
 
